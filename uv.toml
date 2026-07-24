@@ -1,0 +1,5 @@
+# TLS on this machine is intercepted, so the trusted root lives in the Windows
+# cert store rather than in uv's bundled certifi bundle. Without this, `uv run`
+# and `uv add` fail with "invalid peer certificate: UnknownIssuer".
+# (App-side, app/__init__.py does the equivalent via truststore.)
+system-certs = true

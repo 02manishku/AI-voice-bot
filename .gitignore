@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets
+.env
+
+# Last uploaded WAV, rewritten every turn for debugging
+.debug/
+
+# Pre-rendered greeting audio, re-synthesized on demand if deleted
+.cache/
