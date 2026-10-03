@@ -1,13 +1,36 @@
-# Shubh — an AI voice sales agent that answers the phone
+<div align="center">
 
-Shubh is a production voice agent for **Magppie Wellness Kitchens**. Someone dials a
-real phone number, a real voice picks up, and they have a normal sales conversation in
-English, Hindi or a mix of both. Shubh qualifies the lead, answers questions from a
-fixed knowledge base, and tries to get the caller onto WhatsApp with their kitchen
-layout.
+<img src="docs/assets/corvus-logo.svg" width="104" alt="Corvus">
 
-It is not a chatbot with a microphone bolted on. The hard part of a voice agent is not
-transcription or generation, both of which are API calls. The hard part is
+# Corvus
+
+**Answer a real phone call in English or Hindi, without the caller ever waiting on dead air.**
+
+<p>
+  <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/02manishku/AI-voice-bot/tests.yml?branch=main&label=CI&style=flat-square&logo=github&logoColor=white">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-12%20offline%20suites-22c55e?style=flat-square">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white">
+  <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-async-009688?style=flat-square&logo=fastapi&logoColor=white">
+  <img alt="OpenAI" src="https://img.shields.io/badge/OpenAI-gpt--4.1--nano-412991?style=flat-square&logo=openai&logoColor=white">
+  <img alt="Sarvam AI" src="https://img.shields.io/badge/Sarvam%20AI-Saaras%20%2B%20Bulbul-f97316?style=flat-square">
+  <img alt="Exotel" src="https://img.shields.io/badge/Exotel-voicebot%20applet-0ea5e9?style=flat-square">
+  <img alt="Languages" src="https://img.shields.io/badge/speaks-English%20%2B%20हिन्दी-8b5cf6?style=flat-square">
+</p>
+
+</div>
+
+---
+
+Corvus is a voice agent platform for real phone lines. Someone dials a number, a voice
+picks up, and they have a normal conversation in English, Hindi, or a mix of the two.
+
+**Shubh** is the agent Corvus currently runs: a wellness-kitchen sales consultant for
+Magppie. He qualifies the lead, answers from a fixed knowledge base, and tries to get
+the caller onto WhatsApp with their kitchen layout. Swap the knowledge base and the
+persona prompt and the same engine becomes a different agent.
+
+This is not a chatbot with a microphone bolted on. The hard part of a voice agent is
+not transcription or generation, both of which are API calls. The hard part is
 **turn-taking**: knowing when the caller has finished speaking, when they are only
 thinking out loud, when they are interrupting you, whether the sound you just heard was
 even a person, and what to do when you were cut off mid-sentence by nothing at all.
@@ -44,6 +67,17 @@ Most of this repository is that problem.
 The same brain also serves a browser demo at `/`, so you can try it without a phone
 line.
 
+### At a glance
+
+| | |
+|---|---|
+| **Answers in** | about 1.5 s from the end of your sentence, 640 ms at best |
+| **Speaks** | English and Hindi, switching mid-call when you do |
+| **Handles** | interruptions, half-finished sentences, background talkers, speakerphone echo |
+| **Remembers** | callers by phone number, across calls |
+| **Grounded in** | one Markdown knowledge base, no retrieval layer, no invented prices |
+| **Costs** | about Rs 0.6 per turn, with the knowledge base 98-99% prompt-cached |
+
 ---
 
 ## Contents
@@ -67,8 +101,8 @@ line.
 
 ## How one turn actually works
 
-A turn is one round: the caller says something, Shubh answers. There are four stages,
-and every one of them is overlapped with the next wherever physics allows.
+A turn is one round: the caller says something, the agent answers. There are four
+stages, and every one of them is overlapped with the next wherever physics allows.
 
 ### 1. Hearing
 
@@ -133,11 +167,11 @@ pre-opened socket, so the seam between sentence one and the rest is inaudible.
 Synthesis costs roughly 700 ms fixed plus 25 ms per character, which is why answers are
 capped near 30 words. That cap is a latency decision, not a style one.
 
-If the answer is still not ready after 700 ms, Shubh makes a small human noise while he
-thinks: a pre-rendered "Hmm.", "Right.", or in Hindi "जी।", "अच्छा।". It never repeats
-the same one twice in a row, never fires before a goodbye, and costs nothing because
-the clips are rendered once and cached on disk. A person filling a gap sounds alive.
-Two seconds of dead air sounds broken.
+If the answer is still not ready after 700 ms, the agent makes a small human noise
+while he thinks: a pre-rendered "Hmm.", "Right.", or in Hindi "जी।", "अच्छा।". It never
+repeats the same one twice in a row, never fires before a goodbye, and costs nothing
+because the clips are rendered once and cached on disk. A person filling a gap sounds
+alive. Two seconds of dead air sounds broken.
 
 ### Latency budget
 
@@ -161,16 +195,16 @@ is the part that took the most work, and it is almost all in `app/call_ws.py`.
 
 | Problem seen on a real call | What happens now |
 |---|---|
-| Noise and "hmm" became questions, so Shubh pitched at a cough | A two-tier junk filter. Non-lexical fillers are always dropped. Acknowledgements like "okay" or "हाँ" are dropped while he is speaking, but honoured when he is idle, because then they are answers to his own question. |
-| On speakerphone, Shubh answered his own echo | Self-echo filter. A transcript that is 75 percent or more his own recent words, arriving while he speaks or within 3 seconds after, is his voice looping back through the caller's handset. |
+| Noise and "hmm" became questions, so the agent pitched at a cough | A two-tier junk filter. Non-lexical fillers are always dropped. Acknowledgements like "okay" or "हाँ" are dropped while he is speaking, but honoured when he is idle, because then they are answers to his own question. |
+| On speakerphone, the agent answered his own echo | Self-echo filter. A transcript that is 75 percent or more his own recent words, arriving while he speaks or within 3 seconds after, is his voice looping back through the caller's handset. |
 | A colleague talking nearby produced turns in Punjabi, Bengali and Odia | Garble gate. Once the call's language is established, a short turn tagged in a language the call is not happening in is bleed, and is dropped. |
 | A caller said "I want to inquire", paused, got answered mid-thought, then interrupted his own answer | Unfinished-turn hold. A turn ending on a dangling word ("to", "about", "के बारे") waits 3.5 seconds for its continuation and merges the two into one question. The timer refuses to fire while the caller is still mid-word. |
-| A caller said "Okay" three times into silence, then hung up | When a bare acknowledgement arrives with no question pending, Shubh now leads with exactly one unasked discovery question instead of staying mute. |
-| **Background noise cut Shubh off mid-answer and he never spoke again** | False barge-in recovery. The interrupted reply is remembered. If the thing that interrupted turns out to be junk, the phone leg resumes the audio from one second before the cut, or says the answer again with a natural "as I was saying". The rule this taught: every path that cancels a reply must end in either a new reply or a recovery. |
+| A caller said "Okay" three times into silence, then hung up | When a bare acknowledgement arrives with no question pending, the agent now leads with exactly one unasked discovery question instead of staying mute. |
+| **Background noise cut the agent off mid-answer and he never spoke again** | False barge-in recovery. The interrupted reply is remembered. If the thing that interrupted turns out to be junk, the phone leg resumes the audio from one second before the cut, or says the answer again with a natural "as I was saying". The rule this taught: every path that cancels a reply must end in either a new reply or a recovery. |
 | A sub-250 ms noise blip cut the sign-off, produced no turn at all, and left 73 seconds of silence | That path now triggers the same recovery. |
-| Shubh kept talking over a caller trying to interrupt | Barge-in cuts playback within a beat. The phone leg requires sustained speech, not a car horn, before it yields. |
+| The agent kept talking over a caller trying to interrupt | Barge-in cuts playback within a beat. The phone leg requires sustained speech, not a car horn, before it yields. |
 | A caller's closing words were lost when they spoke during a reply | Missed-turn recovery. Speech that ends while a reply is in flight is picked up the moment that reply finishes, instead of being discarded. |
-| A caller said goodbye and Shubh kept selling | Exit-intent guard, in both languages, including the exact phrasings real callers used. It can only prevent a wrong hang-up, never cause one. |
+| A caller said goodbye and the agent kept selling | Exit-intent guard, in both languages, including the exact phrasings real callers used. It can only prevent a wrong hang-up, never cause one. |
 
 ---
 
@@ -238,9 +272,9 @@ Studio-quality text-to-speech sounds wrong on a phone earpiece, and callers noti
 
 ## Languages
 
-Shubh speaks English and Hindi, and mixes them the way people actually do on an Indian
-sales call: Hindi words in Devanagari for native pronunciation, English loanwords left
-in English, as in "देखिए, हमारा पूरा kitchen stone का बनता है".
+The agent speaks English and Hindi, and mixes them the way people actually do on an
+Indian sales call: Hindi words in Devanagari for native pronunciation, English
+loanwords left in English, as in "देखिए, हमारा पूरा kitchen stone का बनता है".
 
 Choosing the language for each turn is deceptively hard, because the speech engine tags
 short Hinglish fragments as English and short Devanagari fragments as Bengali or
@@ -263,17 +297,17 @@ Marathi. The rules:
 
 ## Memory across calls
 
-Shubh remembers people by phone number. After each call, one cheap model call rewrites
-a short note about *the person*, their city, budget, what they are building, which range
-they liked, into `.cache/callers/<number>.json`. On the next call that note is injected
-as context and the remembered language is pre-pinned, so a returning English speaker is
-never greeted in Hindi.
+The agent remembers people by phone number. After each call, one cheap model call
+rewrites a short note about *the person*, their city, budget, what they are building,
+which range they liked, into `.cache/callers/<number>.json`. On the next call that note
+is injected as context and the remembered language is pre-pinned, so a returning
+English speaker is never greeted in Hindi.
 
 Some deliberate choices here. Notes are about the caller, never about prices, which the
 knowledge base already knows. The caller's words enter conversation history at the
 *start* of a turn rather than after a reply survives, because a barge-in used to erase
-the exchange entirely and make Shubh forget a budget he had just been told. And when a
-caller asks directly what Shubh remembers about them, he answers plainly instead of
+the exchange entirely and make the agent forget a budget he had just been told. And
+when a caller asks directly what he remembers about them, he answers plainly instead of
 pretending not to know.
 
 Caller files are gitignored. They contain real phone numbers.
@@ -387,7 +421,8 @@ Everything is typed in `app/config.py` and overridable from `.env`. There is no
 
 ## Tests
 
-Twelve suites run **completely offline**, with no API keys and no credits spent:
+Twelve suites run **completely offline**, with no API keys and no credits spent. They
+are what CI runs on every push:
 
 ```bash
 for f in tests/test_*.py; do uv run python "$f"; done
@@ -436,7 +471,7 @@ app/
   zoho.py          CRM lead lookup for outbound calls
   limits.py        Per-caller and per-day spend guards
   config.py        Every setting, typed
-kb_source/         The knowledge base. Everything Shubh knows
+kb_source/         The knowledge base. Everything the agent knows
 static/            Browser demo: worklet mic capture, RNNoise WASM, player
 docs/              Telephony protocol notes and the provider comparison
 tests/             Twelve offline suites plus live behavioural probes
@@ -462,19 +497,21 @@ instead.
 
 - **A quick tunnel changes hostname on every restart**, so the Exotel applet URL has to
   be updated each time. A permanent deployment is the fix.
-- **It runs on a laptop.** If the machine sleeps, the bot is unreachable.
+- **It runs on a laptop.** If the machine sleeps, the agent is unreachable.
 - **Very short words at the edge of voice detection** can be missed, for example a lone
-  "Okay", or a "bye bye" said over Shubh, which needs about a second of speech to count
-  as an interruption.
+  "Okay", or a "bye bye" said over the agent, which needs about a second of speech to
+  count as an interruption.
 - **Escalation cannot transfer a live call** yet. It reads the escalation line.
 - **Leads bind by recency rather than by phone number** on the outbound Zoho path.
 
 ---
 
-## Credits
+<div align="center">
 
 Built with [Sarvam AI](https://www.sarvam.ai/) for Indic speech recognition and
 synthesis, OpenAI for conversation, [Exotel](https://exotel.com/) for telephony,
 FastAPI, and [RNNoise](https://github.com/xiph/rnnoise) for noise suppression.
 
-The knowledge base content belongs to Magppie Wellness Kitchens.
+<sub>The knowledge base content belongs to Magppie Wellness Kitchens.</sub>
+
+</div>
