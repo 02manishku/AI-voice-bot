@@ -47,10 +47,15 @@ ok &= check(
 )
 
 main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
 main.resolve_language("s2", "What is Magppie?", "en-IN")
 ok &= check(
-    "'अच्छा अच्छा अच्छा' mis-tagged bn -> Devanagari forces hi (not Bengali)",
-    main.resolve_language("s2", "अच्छा अच्छा अच्छा", "bn-IN") == "hi-IN",
+    "'अच्छा अच्छा अच्छा' mis-tagged bn -> NEVER Bengali (stays en, hi now pending)",
+    main.resolve_language("s2", "अच्छा अच्छा अच्छा", "bn-IN") == "en-IN",
+)
+ok &= check(
+    "second consecutive Devanagari turn completes the switch to hi",
+    main.resolve_language("s2", "अच्छा ये बताओ दाम कितना पड़ेगा", "hi-IN") == "hi-IN",
 )
 
 main.SESSION_LANG.clear()
@@ -65,6 +70,105 @@ main.resolve_language("s4", "What is Magppie?", "en-IN")
 ok &= check(
     "a one-word 'okay' (en) does not flip an English session",
     main.resolve_language("s4", "okay", "en-IN") == "en-IN",
+)
+
+# --- switching AWAY to English needs two turns (2026-08-31 caller complaint) ----
+print("\nEnglish-switch hysteresis:")
+main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
+main.resolve_language("s5", "मुझे किचन लगवानी है अपने घर में", "hi-IN")
+ok &= check(
+    "one English question does NOT flip a Hindi call",
+    main.resolve_language("s5", "What about your services?", "en-IN") == "hi-IN",
+)
+ok &= check(
+    "the second consecutive English turn DOES switch",
+    main.resolve_language("s5", "And how much does it cost in total?", "en-IN") == "en-IN",
+)
+ok &= check(
+    "one Devanagari turn does NOT flip the now-English call (symmetric rule)",
+    main.resolve_language("s5", "अरे भाई मुझे पूरा हिसाब बता दो फिर से", "hi-IN") == "en-IN",
+)
+ok &= check(
+    "…but the second consecutive Hindi turn does",
+    main.resolve_language("s5", "हिसाब पूरा चाहिए मुझे भाई सुनो", "hi-IN") == "hi-IN",
+)
+
+# --- 2026-09-02 regression: garble imprisonment ---------------------------------
+print("\ngarble must not flip, fragments must not block the escape:")
+main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
+main.resolve_language("s7", "Hi, what is your name?", "en-IN")
+ok &= check(
+    "Marathi/Devanagari GARBLE ('हे पूर्ण आहे ते') cannot flip an English call",
+    main.resolve_language("s7", "हे पूर्ण आहे ते.", "mr-IN") == "en-IN",
+)
+ok &= check(
+    "the next real English turn puts the call firmly back",
+    main.resolve_language("s7", "So I wanted to understand what all do you have.", "en-IN") == "en-IN",
+)
+
+# --- 2026-09-02 evening regression: the FIRST turn must not pin off garble -----
+print("\nfirst-turn establishment needs a real sentence:")
+main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
+ok &= check(
+    "one-word Devanagari garble ('अपने।') as turn 1 -> English reply, nothing pinned",
+    main.resolve_language("s9", "अपने।", "hi-IN") == "en-IN",
+)
+ok &= check(
+    "…session is still unpinned: a real Hindi sentence next establishes hi at once",
+    main.resolve_language("s9", "मुझे किचन के बारे में जानना है भाई", "hi-IN") == "hi-IN",
+)
+main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
+main.resolve_language("s10", "हेलो?", "hi-IN")  # garbled "Hello" in Devanagari
+ok &= check(
+    "…and a real English sentence next establishes English at once",
+    main.resolve_language("s10", "I want to buy a kitchen for my home", "en-IN") == "en-IN",
+)
+
+main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
+main.resolve_language("s8", "मुझे किचन लगवानी है अपने घर में", "hi-IN")  # wrongly-Hindi call
+main.resolve_language("s8", "Can you tell me about your kitchens please?", "en-IN")  # pending en
+main.resolve_language("s8", "Okay", "en-IN")  # short fragment — must NOT reset the streak
+ok &= check(
+    "a short 'Okay' between two English turns does not reset the escape",
+    main.resolve_language("s8", "What is the price of Wellness Pro?", "en-IN") == "en-IN",
+)
+
+main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
+main.resolve_language("s6", "मुझे किचन लगवानी है अपने घर में", "hi-IN")
+main.resolve_language("s6", "What about your services?", "en-IN")
+main.resolve_language("s6", "अच्छा ठीक है, और गारंटी कितनी है?", "hi-IN")
+ok &= check(
+    "a Hindi turn between two English ones breaks the streak",
+    main.resolve_language("s6", "What is the starting price?", "en-IN") == "hi-IN",
+)
+
+# --- 2026-09-03: the danda "।" is not Devanagari ---------------------------------
+# An Odia fragment (background talk over the greeting) pinned an English
+# caller's call to Hindi through its sentence-final danda.
+print("\nthe danda alone is not a Hindi signal:")
+main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
+ok &= check(
+    "Odia garble 'ହଁ, ଦେଖି ସାରିଲି।' as turn 1 -> English reply",
+    main.resolve_language("s11", "ହଁ, ଦେଖି ସାରିଲି।", "od-IN") == "en-IN",
+)
+ok &= check("…and nothing was pinned", main.SESSION_LANG.get("s11") is None)
+ok &= check(
+    "the caller's real English sentence then pins English",
+    main.resolve_language("s11", "I want to inquire about kitchens", "en-IN") == "en-IN"
+    and main.SESSION_LANG.get("s11") == "en-IN",
+)
+main.SESSION_LANG.clear()
+main.SESSION_LANG_PENDING.clear()
+ok &= check(
+    "real Devanagari with a danda still pins Hindi",
+    main.resolve_language("s12", "मुझे किचन के बारे में जानना है।", "hi-IN") == "hi-IN",
 )
 
 # --- empty / meaningless answer guard (bug 3 — the "…" turn) -------------------

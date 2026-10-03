@@ -41,6 +41,15 @@ CACHE_DIR = PROJECT_ROOT / ".cache"
 LAST_UPLOAD = DEBUG_DIR / "last_upload.wav"
 
 GREETING_WAV: bytes | None = None
+# Spoken when the rate limiter refuses a turn on a PHONE call. Before this, a
+# tripped limiter meant the greeting played and then dead silence — the whole
+# team read it as "the bot is broken" (2026-09-03). Rendered once, disk-cached;
+# playing it costs no Sarvam credits, which is the limiter's whole point.
+BUSY_WAV: bytes | None = None
+BUSY_LINE = (
+    "I'm really sorry, our lines are very busy right now. "
+    "कृपया थोड़ी देर बाद दोबारा कॉल करें। Thank you!"
+)
 # Personalised (per-lead) greeting audio, keyed by a hash of the exact text.
 # Same lead on a repeat call => instant, no re-synthesis. In-memory only.
 PERSONAL_GREETINGS: dict[str, bytes] = {}
@@ -87,11 +96,20 @@ SESSIONS: dict[str, list[dict]] = {}
 # achha achha" (so he replied in Bengali). Anchor to the language the caller has
 # actually been speaking; only switch on a substantial turn in Hindi or English.
 SESSION_LANG: dict[str, str] = {}
+# One substantial foreign-language turn is NOT enough to switch an established
+# session — Saaras tags Hinglish sentences as en-IN, and a single English
+# question in a Hindi call flipped Shubh to English (real caller complained,
+# 2026-08-31: "आपने अपनी भाषा को हिंदी से अंग्रेजी क्यों कर लिया अचानक से?").
+# This remembers the one candidate turn; a second consecutive one confirms it.
+SESSION_LANG_PENDING: dict[str, str] = {}
 _REPLY_LANGUAGES = {"hi-IN", "en-IN"}
 
-# Any Devanagari at all is a definitive Hindi signal — stronger than Saaras's
+# Any Devanagari LETTER is a definitive Hindi signal — stronger than Saaras's
 # language_code, which mis-tags short Devanagari turns as Bengali/Marathi.
-_DEVANAGARI = re.compile(r"[ऀ-ॿ]")
+# Letters only: the danda "।" (U+0964) sits in the Devanagari block but ends
+# sentences in every Indic script — an Odia fragment 'ହଁ, ଦେଖି ସାରିଲି।' pinned an
+# English caller's call to Hindi through its danda (2026-09-03 call).
+_DEVANAGARI = re.compile(r"[ऀ-ॣ०-ॿ]")
 
 # An explicit request to switch language, spoken in EITHER language. Saaras tags
 # "tell me that in Hindi" as en-IN (it's English words), so the ask is invisible
@@ -143,26 +161,49 @@ def resolve_language(session_id: str, text: str, detected: str | None) -> str:
     requested = _requested_language(text)
     if requested:
         SESSION_LANG[key] = requested
+        SESSION_LANG_PENDING.pop(key, None)
         return requested
 
     if _DEVANAGARI.search(text):
-        candidate, substantial = "hi-IN", True   # Devanagari present = Hindi, full stop
+        candidate, substantial = "hi-IN", True   # Devanagari present = Hindi signal
+        # …but for ESTABLISHING a fresh session, script alone is not enough:
+        # a one-word garble ('अपने।', noise while the greeting played) pinned a
+        # real English call to Hindi (2026-09-02). Pinning needs real words.
+        weighty = len(text.split()) >= 3
     else:
         candidate = detected if detected in _REPLY_LANGUAGES else None
-        substantial = len(text.split()) >= 4 or len(text) >= 15
+        substantial = weighty = len(text.split()) >= 4 or len(text) >= 15
 
     if established is None:
-        # English is the baseline: open in English unless the caller's first turn
-        # is clearly in another language we speak (detected Hindi, or any
-        # Devanagari — candidate is already "hi-IN" in those cases).
-        lang = candidate or "en-IN"
-    elif substantial and candidate:
-        lang = candidate                     # a real switch is allowed
-    else:
-        lang = established                   # short/uncertain turn: stay put
+        # English is the baseline: open in English unless the caller's first
+        # REAL sentence is clearly in another language we speak. A short first
+        # turn establishes nothing — answer it in the greeting's language and
+        # let the caller's first proper sentence decide.
+        if weighty and candidate:
+            SESSION_LANG[key] = candidate
+            return candidate
+        return "en-IN"
 
-    SESSION_LANG[key] = lang
-    return lang
+    # SYMMETRIC two-turn hysteresis. One turn must never flip an established
+    # call in EITHER direction: a lone English line flipped a Hindi call
+    # (2026-08-31 complaint), and a lone Devanagari GARBLE — background noise
+    # transcribed as Marathi 'हे पूर्ण आहे ते.' — flipped an English call to
+    # Hindi (2026-09-02 complaint). Only two consecutive substantial turns in
+    # the other language switch. Short/uncertain turns advance nothing AND
+    # break nothing — a fragmented speaker ("Okay", "down") must still be able
+    # to complete the two-turn escape.
+    if substantial and candidate:
+        if candidate == established:
+            SESSION_LANG_PENDING.pop(key, None)  # back on the call's language
+        elif SESSION_LANG_PENDING.get(key) == candidate:
+            SESSION_LANG_PENDING.pop(key, None)
+            SESSION_LANG[key] = candidate
+            log.info("language: switched %s -> %s (second consecutive turn)", established, candidate)
+            return candidate
+        else:
+            SESSION_LANG_PENDING[key] = candidate
+            log.info("language: %s turn in a %s call — staying, one more confirms", candidate, established)
+    return established
 
 
 async def _load_greeting() -> bytes | None:
@@ -180,6 +221,8 @@ async def _load_greeting() -> bytes | None:
             settings.sarvam_tts_model,
             settings.sarvam_tts_speaker,
             str(settings.sarvam_tts_pace),
+            str(settings.sarvam_tts_pace_greeting),
+            str(settings.sarvam_tts_loudness),
             # The greeting says "Magppie", so the pronunciation dictionary
             # changes the audio. Without this the cache would serve the old
             # mispronounced take forever.
@@ -196,7 +239,11 @@ async def _load_greeting() -> bytes | None:
         return None
 
     try:
-        wav = await tts.synthesize(prompts.GREETING, prompts.GREETING_LANGUAGE)
+        # The intro plays at its own (slower) pace so "Magppie" registers —
+        # team feedback 2026-08-31: the greeting flew by too fast to place.
+        wav = await tts.synthesize(
+            prompts.GREETING, prompts.GREETING_LANGUAGE, pace=settings.sarvam_tts_pace_greeting
+        )
     except Exception as exc:
         # Never fatal: the call can still open, just without an instant greeting.
         log.warning("greeting: could not pre-render (%s) — will retry on request", exc)
@@ -207,6 +254,94 @@ async def _load_greeting() -> bytes | None:
     return wav
 
 
+async def _load_busy_line() -> bytes | None:
+    """Render the rate-limit apology once and cache it on disk — same pattern
+    as the greeting. Soft: without it, a tripped limiter is silent again."""
+    key = "|".join(
+        [
+            BUSY_LINE,
+            settings.sarvam_tts_model,
+            settings.sarvam_tts_speaker,
+            str(settings.sarvam_tts_pace),
+            tts.DICT_ID or "no-dict",
+        ]
+    )
+    cached = CACHE_DIR / f"busyline_{hashlib.sha256(key.encode()).hexdigest()[:16]}.wav"
+    if cached.exists():
+        return cached.read_bytes()
+    if settings.missing_keys():
+        return None
+    try:
+        wav = await tts.synthesize(BUSY_LINE, "en-IN")
+    except Exception as exc:
+        log.warning("busy line: could not pre-render (%s)", exc)
+        return None
+    cached.write_bytes(wav)
+    log.info("busy line: rendered and cached (%s, %d bytes)", cached.name, len(wav))
+    return wav
+
+
+# Short "thinking beats" (see call_ws._thinking_beat), pre-rendered per reply
+# language and kept as raw PCM at tts.TTS_SAMPLE_RATE so either leg plays them
+# as-is. Plain, neutral sounds a consultant makes before answering — nothing
+# that presumes the answer ("Yes.", "Great question.").
+FILLER_LINES: dict[str, list[str]] = {
+    "en-IN": ["Hmm.", "Right.", "Okay.", "Sure."],
+    "hi-IN": ["जी।", "हम्म।", "अच्छा।", "ठीक है।"],
+}
+FILLER_CLIPS: dict[str, list[bytes]] = {}
+
+
+def filler_clips(language: str) -> list[bytes]:
+    return FILLER_CLIPS.get(language) or FILLER_CLIPS.get("en-IN") or []
+
+
+def _wav_to_pcm(wav_bytes: bytes, rate: int) -> bytes:
+    """Mono 16-bit PCM at `rate` from a Bulbul WAV."""
+    import audioop
+    import io
+    import wave
+
+    with wave.open(io.BytesIO(wav_bytes)) as w:
+        src = w.getframerate()
+        frames = w.readframes(w.getnframes())
+        if w.getsampwidth() != 2:
+            frames = audioop.lin2lin(frames, w.getsampwidth(), 2)
+        if w.getnchannels() == 2:
+            frames = audioop.tomono(frames, 2, 0.5, 0.5)
+    if src != rate:
+        frames, _ = audioop.ratecv(frames, 2, 1, src, rate, None)
+    return frames
+
+
+async def _load_fillers() -> dict[str, list[bytes]]:
+    """Render the thinking beats once and cache them on disk, like the greeting.
+    Soft: a beat that fails to render is simply not in the rotation."""
+    out: dict[str, list[bytes]] = {}
+    if settings.missing_keys():
+        return out
+    for lang, lines in FILLER_LINES.items():
+        clips: list[bytes] = []
+        for line in lines:
+            key = "|".join(
+                [line, lang, settings.sarvam_tts_model, settings.sarvam_tts_speaker,
+                 str(settings.sarvam_tts_pace), tts.DICT_ID or "no-dict"]
+            )
+            cached = CACHE_DIR / f"filler_{hashlib.sha256(key.encode()).hexdigest()[:16]}.wav"
+            try:
+                if cached.exists():
+                    wav = cached.read_bytes()
+                else:
+                    wav = await tts.synthesize(line, lang)
+                    cached.write_bytes(wav)
+                clips.append(_wav_to_pcm(wav, tts.TTS_SAMPLE_RATE))
+            except Exception as exc:
+                log.warning("filler: could not render %r (%s)", line, exc)
+        out[lang] = clips
+    log.info("filler: %d thinking beats ready", sum(len(v) for v in out.values()))
+    return out
+
+
 async def _personal_greeting_wav(text: str) -> bytes | None:
     """Synthesize a per-lead greeting, memoised by its exact text.
 
@@ -215,12 +350,16 @@ async def _personal_greeting_wav(text: str) -> bytes | None:
     costs no TTS. Soft: any synthesis failure returns None and the caller drops
     to the generic greeting.
     """
-    key = hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
+    key = hashlib.sha256(
+        f"{text}|{settings.sarvam_tts_loudness}|{settings.sarvam_tts_pace_greeting}".encode("utf-8")
+    ).hexdigest()[:16]
     hit = PERSONAL_GREETINGS.get(key)
     if hit is not None:
         return hit
     try:
-        wav = await tts.synthesize(text, prompts.GREETING_LANGUAGE)
+        wav = await tts.synthesize(
+            text, prompts.GREETING_LANGUAGE, pace=settings.sarvam_tts_pace_greeting
+        )
     except Exception as exc:
         log.warning("greeting: personalised synth failed (%s) — generic", exc)
         return None
@@ -262,9 +401,25 @@ async def _prewarm_llm() -> None:
         log.warning("llm: prewarm skipped (%s)", exc)
 
 
+def prewarm_llm_if_stale() -> None:
+    """Fire a background prewarm if the prompt cache has likely expired.
+
+    OpenAI's cache prefix lives ~5-10 min. A call that starts after the server
+    idled longer than that would pay the cold prefix on the caller's FIRST
+    question (+1-2.5s at exactly the worst moment). The greeting runs seconds
+    before that first question, so warming here hides the whole cost inside the
+    greeting playback. No-op when the cache is already warm, so back-to-back
+    calls cost nothing extra.
+    """
+    if llm.cache_is_warm():
+        return
+    log.info("llm: cache likely cold — prewarming behind the greeting")
+    asyncio.create_task(_prewarm_llm())
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global KB, GREETING_WAV
+    global KB, GREETING_WAV, BUSY_WAV, FILLER_CLIPS
     # Any KBError here is fatal by design: a half-empty KB looks healthy and
     # answers "I don't know" to everything.
     KB = kb_mod.load_kb()
@@ -283,6 +438,9 @@ async def lifespan(app: FastAPI):
 
     # Pre-rendered so turn one is instant (§10) and costs nothing per call.
     GREETING_WAV = await _load_greeting()
+    BUSY_WAV = await _load_busy_line()
+    if settings.reply_filler:
+        FILLER_CLIPS = await _load_fillers()
 
     # If Zoho is wired up, warm the freshest lead's greeting now so the first
     # personalised call is instant too. Soft — a Zoho hiccup never blocks startup.
@@ -375,6 +533,9 @@ async def greeting(request: Request):
     silently falls back to the assistant greeting.
     """
     global GREETING_WAV
+
+    # A greeting means a real turn is ~10s away — make sure it lands warm.
+    prewarm_llm_if_stale()
 
     mode, session_id = "assistant", ""
     try:
@@ -663,6 +824,15 @@ async def ws_call(websocket: WebSocket):
     """Phase 3 streaming call: mic in, Sarvam VAD turn-taking, audio out, barge-in.
     Gated by STT_STREAMING; the browser only dials this when health says it's on."""
     await call_ws.handle(websocket)
+
+
+@app.websocket("/exotel/stream")
+async def ws_exotel(websocket: WebSocket):
+    """Exotel Voicebot Applet endpoint: a real phone call's audio, both ways.
+    Configure the applet URL as wss://KEY:TOKEN@host/exotel/stream?sample-rate=16000."""
+    from app import exotel_ws
+
+    await exotel_ws.handle(websocket)
 
 
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

@@ -17,3 +17,13 @@ wheels/
 
 # Pre-rendered greeting audio, re-synthesized on demand if deleted
 .cache/
+
+# Runtime logs
+*.log
+*.log.*
+
+# College paperwork and internal Magppie business documents: useful locally,
+# but this repo is public. Kept off GitHub deliberately.
+*.docx
+docs/ceo-price-groups-*.md
+docs/Magppie-VoiceBot-GoLive-Qualification-Sheet.pdf

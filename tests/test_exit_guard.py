@@ -32,6 +32,18 @@ EXITS = [
     "नहीं करनी बात",
     "बंद करो",
     "बस करो भाई",
+    # the 2026-08-31 real call: guard blocked this and the caller had to cut
+    # the call himself after a confused "Hello"
+    "नहीं, मैं और कुछ जानना नहीं चाहूंगा। थैंक यू।",
+    "और कुछ नहीं चाहिए",
+    "aur kuch nahi janna mujhe",
+    "बस इतना ही था मेरा",
+    "बस हो गया भाई",
+    "बहुत हो गया।",          # "enough already" — 2026-09-02 caller, guard blocked it
+    "nothing else, thank you",
+    "no more questions",
+    "I'm done, thanks",
+    "that'll be all",
 ]
 
 # NOT exit intent — a model that flags end_call here is misfiring; guard blocks it.
@@ -46,6 +58,10 @@ NOT_EXITS = [
     "ok",                       # filler
     "matte finish dikhao",      # 'mat' inside a word must not match "mat call"
     "band gala suit jaisa design",  # 'band' inside a phrase, not "band karo"
+    # declining ONE topic mid-call is not "I'm done" — from the same real call
+    "तनुष के बारे में नहीं जानना चाहूंगा, आप मुझे ये बताएं कि गारंटी क्या है",
+    "बस इतना बताओ कि प्राइस क्या है",   # "just tell me this" is a question
+    "और कुछ ऑप्शंस बताओ",              # asking for MORE, not ending
 ]
 
 

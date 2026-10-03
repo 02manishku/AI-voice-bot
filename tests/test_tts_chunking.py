@@ -34,7 +34,7 @@ def install():
     spoken.clear()
     emitted_at_speak.clear()
 
-    async def fake_speak(text, lang):
+    async def fake_speak(text, lang, ready=None):
         # Mirror the real _speak: empty text synthesizes nothing.
         text = (text or "").strip()
         if not text:
@@ -44,6 +44,16 @@ def install():
         yield b"\x00\x00" * 8
 
     tts._speak = fake_speak
+
+    # The real _open_socket dials Sarvam; the pre-open must be inert in tests.
+    class FakeCM:
+        async def __aexit__(self, *a):
+            return None
+
+    async def fake_open_socket(lang):
+        return FakeCM(), object()
+
+    tts._open_socket = fake_open_socket
 
 
 async def llm_deltas(text=ANSWER, step=10):

@@ -52,6 +52,12 @@ _MISHEARD_BRAND = re.compile(
           mac \s*[-–]?\s* (?: pay | pai | bye? | pie | pe | py )   # MacPay, Mac by, Mac pie
         | mag \s*[-–]?\s* (?: pie | pai | pay | pee | py | p )     # magpie, mag pie, MagPy
         | मैगपाई | मैग \s* पाई | मैकपे | मैक \s* पे | मैगपी | मैग्पी
+        # From the 2026-08-31 real call: "मैप पे की किचन", "मैक भाई की प्राइसिंग",
+        # "मैक पाई", "मैप पाइ के किचन". "मैप पे" alone could genuinely mean "on
+        # the map" ("showroom मैप पे भेज दो"), so it only counts when what
+        # follows makes it possessive — की/का/के/किचन/वाल.
+        | मैक \s* पाई | मैक \s* भाई | मैप \s* पा[ईइय]
+        | मैप \s* पे (?= \s* (?: की | का | के | किचन | वाल ) )
     )(?!\w)""",
     re.IGNORECASE | re.VERBOSE,
 )
@@ -69,6 +75,112 @@ def normalize_transcript(text: str) -> str:
     if n:
         log.info("stt: repaired %d misheard brand name(s) -> %r", n, fixed)
     return fixed
+
+# --- unit abbreviations and year counts: what the model writes vs what Shubh SAYS
+#
+# The model abbreviates units on its own ("25 yrs की guarantee", "per sq. ft.")
+# even though the KB spells them out — and Bulbul then spells the abbreviation
+# letter by letter. A real caller literally asked "What is 25 YEAR?" on a team
+# test call (2026-08-31). Expand them to full words just before synthesis; this
+# runs on every TTS path (streaming head/tail, REST, greeting). Keep the list
+# to abbreviations that only ever mean the unit — same precision rule as the
+# misheard-brand list above.
+_UNIT_REWRITES: list[tuple[re.Pattern, object]] = [
+    # "25 yrs" / "25-yr" / "25yr" -> "25 years" (singular for exactly 1). The
+    # dot after "yrs." stays: at sentence end it IS the sentence period.
+    (
+        re.compile(r"(?<!\w)(\d+)\s*[-–]?\s*yrs?\b", re.IGNORECASE),
+        lambda m: f"{m.group(1)} {'year' if m.group(1) == '1' else 'years'}",
+    ),
+    # a bare "yrs" with no number still reads as the unit
+    (re.compile(r"(?<!\w)yrs\b", re.IGNORECASE), "years"),
+    # "25-year guarantee" -> "25 year guarantee". Bulbul's preprocessor takes a
+    # digit-hyphen-letters token as an alphanumeric code and reads it out
+    # character by character — the team heard "two five Y-A-R guarantee" on a
+    # call (2026-09-03). The KB wrote "25-year" everywhere, so the model did too.
+    (re.compile(r"(?<!\w)(\d+)\s*[-–]\s*(years?|साल|वर्ष)", re.IGNORECASE), r"\1 \2"),
+    # "25+ years" -> "25 plus years" (the "+" is silent or spelled otherwise)
+    (re.compile(r"(?<!\w)(\d+)\s*\+\s*(?=(?:years?|साल|वर्ष))", re.IGNORECASE), r"\1 plus "),
+    # "sq. ft." / "sq ft" / "sq.ft" / "sqft" -> "square feet"
+    (re.compile(r"(?<!\w)sq\.?\s*ft\b\.?", re.IGNORECASE), "square feet"),
+    (re.compile(r"(?<!\w)sqft\b\.?", re.IGNORECASE), "square feet"),
+    (re.compile(r"(?<!\w)sq\.?\s*feet\b", re.IGNORECASE), "square feet"),
+]
+
+# Year counts are then written out in WORDS in the synthesis language. Digits
+# are right everywhere else (prices, sizes, phone numbers — Bulbul reads them
+# correctly and the prompt asks for them), but a count of years is the one
+# number every guarantee answer turns on, so it gets the deterministic
+# treatment: "twenty five years" / "पच्चीस साल". Nothing left for the engine to
+# guess. Only 1-3 digit counts directly before a year word are touched.
+_EN_ONES = (
+    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+    "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+    "sixteen", "seventeen", "eighteen", "nineteen",
+)
+_EN_TENS = ("", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety")
+_HI_WORDS = (
+    "शून्य", "एक", "दो", "तीन", "चार", "पाँच", "छह", "सात", "आठ", "नौ", "दस",
+    "ग्यारह", "बारह", "तेरह", "चौदह", "पंद्रह", "सोलह", "सत्रह", "अठारह", "उन्नीस", "बीस",
+    "इक्कीस", "बाईस", "तेईस", "चौबीस", "पच्चीस", "छब्बीस", "सत्ताईस", "अट्ठाईस", "उनतीस", "तीस",
+    "इकतीस", "बत्तीस", "तैंतीस", "चौंतीस", "पैंतीस", "छत्तीस", "सैंतीस", "अड़तीस", "उनतालीस", "चालीस",
+    "इकतालीस", "बयालीस", "तैंतालीस", "चौवालीस", "पैंतालीस", "छियालीस", "सैंतालीस", "अड़तालीस", "उनचास", "पचास",
+    "इक्यावन", "बावन", "तिरपन", "चौवन", "पचपन", "छप्पन", "सत्तावन", "अट्ठावन", "उनसठ", "साठ",
+    "इकसठ", "बासठ", "तिरसठ", "चौंसठ", "पैंसठ", "छियासठ", "सड़सठ", "अड़सठ", "उनहत्तर", "सत्तर",
+    "इकहत्तर", "बहत्तर", "तिहत्तर", "चौहत्तर", "पचहत्तर", "छिहत्तर", "सतहत्तर", "अठहत्तर", "उनासी", "अस्सी",
+    "इक्यासी", "बयासी", "तिरासी", "चौरासी", "पचासी", "छियासी", "सत्तासी", "अठासी", "नवासी", "नब्बे",
+    "इक्यानवे", "बानवे", "तिरानवे", "चौरानवे", "पचानवे", "छियानवे", "सत्तानवे", "अट्ठानवे", "निन्यानवे", "सौ",
+)
+_DEVANAGARI = re.compile(r"[ऀ-ॿ]")
+# A 1-3 digit count right before a year word. Not a piece of a bigger number
+# ("1,300 years", "2.5 years") and not one end of a range ("2-3 years") — those
+# stay digits. The unit itself is kept exactly as the model wrote it.
+_YEAR_COUNT = re.compile(
+    r"(?<![\w,.\-–])(\d{1,3})(?=\s+(?:plus\s+)?(?:years?|साल|वर्ष)(?![A-Za-z]))",
+    re.IGNORECASE,
+)
+
+
+def _en_number(n: int) -> str | None:
+    if n < 20:
+        return _EN_ONES[n]
+    if n < 100:
+        tens, ones = divmod(n, 10)
+        return _EN_TENS[tens] + ("" if ones == 0 else " " + _EN_ONES[ones])
+    if n == 100:
+        return "one hundred"
+    return None
+
+
+def _hi_number(n: int) -> str | None:
+    return _HI_WORDS[n] if n <= 100 else None
+
+
+def _spell_year_counts(text: str, lang: str | None) -> str:
+    if lang == "hi-IN" and _DEVANAGARI.search(text):
+        words = _hi_number
+    elif lang in (None, "en-IN", "hi-IN"):
+        # hi-IN with no Devanagari at all is an English sentence on a Hindi call
+        words = _en_number
+    else:
+        return text  # Marathi, Gujarati, ...: leave Bulbul's own number reading alone
+
+    def repl(m: re.Match) -> str:
+        spelled = words(int(m.group(1)))
+        return spelled if spelled is not None else m.group(0)
+
+    return _YEAR_COUNT.sub(repl, text)
+
+
+def normalize_speech_text(text: str, lang: str | None = None) -> str:
+    """Expand unit abbreviations and spell out year counts, so TTS speaks
+    words — never letter salad. `lang` is the synthesis language (Bulbul code)."""
+    if not text:
+        return text
+    for pattern, repl in _UNIT_REWRITES:
+        text = pattern.sub(repl, text)
+    return _spell_year_counts(text, lang)
+
 
 # Keyed by target_language_code; only entries matching the synthesis language
 # are applied. Keys are matched against the text the model wrote, so cover the

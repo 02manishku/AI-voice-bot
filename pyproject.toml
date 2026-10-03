@@ -9,6 +9,7 @@ dependencies = [
     "openai>=2.46.0",
     "pdfplumber>=0.11.10",
     "pydantic-settings>=2.14.2",
+    "pyrnnoise>=0.4.3",
     "python-multipart>=0.0.32",
     "sarvamai>=0.1.28",
     "tiktoken>=0.13.0",

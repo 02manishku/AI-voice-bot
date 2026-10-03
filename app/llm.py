@@ -6,9 +6,11 @@ reading the partially-complete "answer" string out of the buffer, so the §10
 drains it.
 """
 
+import asyncio
 import json
 import logging
 import re
+import time
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import AsyncIterator
@@ -55,6 +57,17 @@ _EXIT_INTENT = re.compile(
     | (chhod|chod)(o|iye|na) | \bjaane?\s+do\b | reh?ne\s+(do|de)
     | अलविदा | बाय | बात\s*नहीं | नहीं\s*कर | बंद\s*कर
     | रख(ता|ती)\s*हूँ | बस\s*कर | काट\s*(दो|दीजिए|दे) | छोड़ | रहने\s*(दे|दो)
+    # "I'm done" phrasings — a real caller said "मैं और कुछ जानना नहीं चाहूंगा।
+    # थैंक यू।" (2026-08-31) and the guard blocked the hang-up; he then said a
+    # confused "Hello" and had to cut the call himself. The "और कुछ" anchor is
+    # what keeps this safe: a mid-call "उसके बारे में नहीं जानना चाहूंगा, ये
+    # बताएं..." has no "और कुछ" and still cannot hang up.
+    | और\s*कुछ\s*(भी\s*)?(जानना|पूछना|सुनना)?\s*नह[ीि]
+    | aur\s+kuch\s+(bhi\s+)?(jaan|pooch|sun)\S*\s+nah(i|in) | aur\s+kuch\s+nah(i|in)
+    | बस\s*इतना\s*(ही|काफी) | bas\s+itna\s+(hi|k?aafi|kafi)
+    | बस\s*हो\s*गया | bas\s+ho\s+gaya | बहुत\s*हो\s*गया | bah?ut\s+ho\s+gaya
+    | \bnothing\s+else\b | \bno\s+more\s+questions?\b | \bi'?m\s+done\b
+    | \bthat('?ll|\s+will)\s+be\s+all\b
     """
 )
 
@@ -161,6 +174,25 @@ def _client() -> AsyncOpenAI:
     return AsyncOpenAI(api_key=settings.openai_api_key)
 
 
+# monotonic() of the last OpenAI call — lets main/call_ws decide whether the
+# prompt cache (TTL ~5-10 min) is likely still warm before spending on a ping.
+last_call_at: float = 0.0
+
+# OpenAI routes requests to cache shards partly by this key. Without it,
+# routing roulette occasionally lands a turn on a cold shard: measured live as
+# the rare cached=0 turn that costs +1-2.5s. A constant key pins every call —
+# prewarm included — to the same warm shard. (Priority tier was benchmarked
+# 2026-08-17 for the same purpose and REJECTED: no faster, and switching tiers
+# lost the warm shard entirely.)
+PROMPT_CACHE_KEY = "magppie-kb"
+
+
+def cache_is_warm(ttl: float = 240.0) -> bool:
+    """True if an OpenAI call happened recently enough that the prompt-cache
+    prefix is very likely still resident."""
+    return last_call_at > 0 and (time.monotonic() - last_call_at) < ttl
+
+
 # ---- Sarvam path -------------------------------------------------------------
 # sarvam-30b has no strict-JSON mode and is a reasoning model, so the OpenAI
 # JSON approach doesn't fit. Instead: plain-text answer (streams straight to
@@ -211,12 +243,15 @@ async def _stream_sarvam(
     language_code: str,
     into: GroundedAnswer | None,
     context: str | None = None,
+    nudge: str | None = None,
 ) -> AsyncIterator[str]:
     system = build_system_prompt(kb_text) + _SARVAM_OUTPUT_OVERRIDE
     messages = [{"role": "system", "content": system}]
     if context:
         messages.append({"role": "system", "content": context})
     messages.extend(history)
+    if nudge:
+        messages.append({"role": "system", "content": nudge})
     messages.append({"role": "user", "content": build_user_message(question, language_code)})
 
     stream = await _sarvam_client().chat.completions(
@@ -258,7 +293,14 @@ async def _stream_sarvam(
         into.citations = _kb_sources(kb_text) if into.text else []
 
 
-def _messages(kb_text: str, question: str, history, language_code: str, context: str | None = None):
+def _messages(
+    kb_text: str,
+    question: str,
+    history,
+    language_code: str,
+    context: str | None = None,
+    nudge: str | None = None,
+):
     # Static prefix first (KB + rules), variable content last, or prefix
     # caching never hits.
     msgs = [{"role": "system", "content": build_system_prompt(kb_text)}]
@@ -269,8 +311,73 @@ def _messages(kb_text: str, question: str, history, language_code: str, context:
     if context:
         msgs.append({"role": "system", "content": context})
     msgs.extend(history)
+    # A one-turn director's note (prompts.NUDGE_*) sits right next to the turn
+    # it steers — adjacent beats buried, for a small model — and is never
+    # stored in history, so it steers exactly one reply.
+    if nudge:
+        msgs.append({"role": "system", "content": nudge})
     msgs.append({"role": "user", "content": build_user_message(question, language_code)})
     return msgs
+
+
+# Tail-latency hedge. The first token normally lands in ~1.0-1.3s, but OpenAI
+# sometimes sits on a request for 3-7s (two such turns in one replayed call,
+# 2026-09-03) — on a phone that is the difference between "quick" and "dead".
+# If no first chunk has arrived by HEDGE_AFTER, an identical second request is
+# raced against the first and whichever answers first is used; the other is
+# closed. Costs one extra (99%-cached, cheap) call on the slow turns only.
+HEDGE_AFTER = 1.8
+
+
+async def _open(kwargs: dict):
+    """Open one streaming request and wait for its FIRST chunk (that wait IS
+    the time-to-first-token). Returns (stream, iterator, first_chunk); closes
+    the stream if cancelled while waiting."""
+    stream = await _client().chat.completions.create(**kwargs)
+    try:
+        ait = stream.__aiter__()
+        first = await ait.__anext__()
+    except BaseException:
+        await stream.close()
+        raise
+    return stream, ait, first
+
+
+async def _hedged_chunks(kwargs: dict):
+    """Yield the chunks of whichever request produces a first token first."""
+    t1 = asyncio.create_task(_open(kwargs))
+    done, _ = await asyncio.wait({t1}, timeout=HEDGE_AFTER)
+    if t1 in done and not t1.exception():
+        winner, loser = t1, None
+    else:
+        if t1 in done:  # the first request FAILED outright — retry, don't race
+            log.warning("llm: first request failed (%s) — retrying", t1.exception())
+            t1 = asyncio.create_task(_open(kwargs))
+            winner, loser = t1, None
+            await asyncio.wait({t1})
+        else:
+            log.info("llm: no first token after %.1fs — hedging with a second request", HEDGE_AFTER)
+            t2 = asyncio.create_task(_open(kwargs))
+            done, _ = await asyncio.wait({t1, t2}, return_when=asyncio.FIRST_COMPLETED)
+            winner = t1 if t1 in done and not t1.exception() else t2
+            if winner not in done or winner.exception():
+                # the one that finished first failed; fall back to the other
+                winner = t2 if winner is t1 else t1
+                await asyncio.wait({winner})
+            loser = t2 if winner is t1 else t1
+            log.info("llm: hedge — %s request won", "first" if winner is t1 else "second")
+    if loser is not None:
+        if loser.done() and not loser.cancelled() and not loser.exception():
+            await loser.result()[0].close()
+        else:
+            loser.cancel()
+    stream, ait, first = winner.result()
+    try:
+        yield first
+        async for chunk in ait:
+            yield chunk
+    finally:
+        await stream.close()
 
 
 async def _stream_deltas(
@@ -280,13 +387,24 @@ async def _stream_deltas(
     language_code: str,
     raw: list[str] | None = None,
     context: str | None = None,
+    nudge: str | None = None,
 ) -> AsyncIterator[str]:
     """Yield prose deltas; append every raw JSON delta to `raw` if given."""
-    stream = await _client().chat.completions.create(
+    global last_call_at
+    last_call_at = time.monotonic()
+    kwargs = dict(
         model=settings.openai_model,
-        messages=_messages(kb_text, question, history, language_code, context),
+        messages=_messages(kb_text, question, history, language_code, context, nudge),
         stream=True,
-        temperature=0.2,
+        # 0.6, not 0.2: at 0.2 the model is near-deterministic, so the same
+        # question gets the same recited sentence every time — the #1 "it's a bot"
+        # tell callers noticed. Structured output (json_schema, strict) holds the
+        # format regardless. (0.7 + frequency_penalty 0.4 was tried and produced
+        # occasional off-key word choices in Hindi — the penalty was steering the
+        # model away from the domain's own natural words. Keep both gentle; the
+        # press-again ladder in the prompt is what really prevents repeats.)
+        temperature=0.6,
+        frequency_penalty=0.15,
         # A hard ceiling on runaway answers (answer + citations + end_call JSON).
         # ~30 words is the target; 200 tokens leaves room without truncating.
         max_tokens=200,
@@ -294,6 +412,8 @@ async def _stream_deltas(
         # is actually being cached — if it isn't, the prompt ordering is broken
         # and we're paying full price and full latency for it every time.
         stream_options={"include_usage": True},
+        # Pin cache-shard routing (see PROMPT_CACHE_KEY above).
+        extra_body={"prompt_cache_key": PROMPT_CACHE_KEY},
         response_format={
             "type": "json_schema",
             "json_schema": {
@@ -306,7 +426,7 @@ async def _stream_deltas(
 
     buf = ""
     emitted = 0
-    async for chunk in stream:
+    async for chunk in _hedged_chunks(kwargs):
         if chunk.usage:
             cached = getattr(chunk.usage.prompt_tokens_details, "cached_tokens", 0) or 0
             total = chunk.usage.prompt_tokens or 0
@@ -370,6 +490,7 @@ async def stream_answer(
     language_code: str,
     into: GroundedAnswer | None = None,
     context: str | None = None,
+    nudge: str | None = None,
 ) -> AsyncIterator[str]:
     """Yield prose deltas as they arrive.
 
@@ -380,16 +501,23 @@ async def stream_answer(
     Pass `context` to pin a per-call system note (e.g. the CRM lead on an
     outbound call) that rides along every turn without ageing out of history.
 
+    Pass `nudge` for a one-turn director's note (prompts.NUDGE_*) about the
+    moment — it steers this reply only and never enters history.
+
     Provider is chosen by settings.llm_provider. Both branches expose the same
     contract: yield prose deltas, fill `into` at the end.
     """
     if settings.llm_provider == "sarvam":
-        async for delta in _stream_sarvam(kb_text, question, history, language_code, into, context):
+        async for delta in _stream_sarvam(
+            kb_text, question, history, language_code, into, context, nudge
+        ):
             yield delta
     else:
         raw: list[str] = []
         chunks: list[str] = []
-        async for delta in _stream_deltas(kb_text, question, history, language_code, raw, context):
+        async for delta in _stream_deltas(
+            kb_text, question, history, language_code, raw, context, nudge
+        ):
             chunks.append(delta)
             yield delta
         if into is not None:
@@ -407,9 +535,12 @@ async def answer(
     history: list[dict],
     language_code: str,
     context: str | None = None,
+    nudge: str | None = None,
 ) -> GroundedAnswer:
     """Drain the stream and parse out prose + citations."""
     result = GroundedAnswer()
-    async for _ in stream_answer(kb_text, question, history, language_code, into=result, context=context):
+    async for _ in stream_answer(
+        kb_text, question, history, language_code, into=result, context=context, nudge=nudge
+    ):
         pass
     return result

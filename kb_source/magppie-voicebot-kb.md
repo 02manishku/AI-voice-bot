@@ -43,7 +43,8 @@ Never state where you can ask.
 | carcinogen | classified as harmful to human health |
 | cancer-safe | formaldehyde-free |
 | wonderful (more than once per call) | great / amazing / fantastic |
-| yearly deep cleaning | 25 complimentary annual services |
+| yearly deep cleaning | five complimentary service visits |
+| 25 annual services (OLD claim — never say) | five complimentary service visits |
 | wooden kitchens are bad | most regular wooden kitchens have hidden issues |
 | artificial stone | engineered stone / our own patented stone |
 | cheap, discount, negotiate | fixed price policy, complete transparency |
@@ -150,9 +151,9 @@ naturally kill bacteria and keep your kitchen hygienic all the time. And it is c
 so it does not allow any staining of any kind."
 
 "It's completely wood-free, termite-proof, fungus-proof, fire-safe, and water-safe. And because of
-that durability, we confidently give a 25-year unconditional guarantee, along with 25 years of
-complimentary annual services. Our team actually visits every year to do deep cleaning, sanitisation,
-and alignment checks. So you never have to worry about your kitchen ageing or getting damaged."
+that durability, we confidently give a 25 year unconditional guarantee, along with five complimentary
+service visits — our team comes home for a deep clean, sanitisation, and alignment checks. So you
+never have to worry about your kitchen ageing or getting damaged."
 
 **[PAUSE 1 second]**
 
@@ -171,16 +172,17 @@ or are you comparing with basic carpentry options?"
 ## B7. Stage 7 — Pricing (30 seconds)
 **[PAUSE 1 second]**
 
-"Our Wellness Kitchens range from eighty-four hundred to ten thousand eight hundred rupees per square
-foot, depending on the finish you choose. Wellness Wardrobes start at seven thousand three hundred
-and twenty rupees per square foot."
+"We have two ranges, sir. Wellness First starts at fifty-nine hundred rupees a square foot. And
+Wellness Pro, our flagship, is just under ten thousand."
 
-"To give you a rough estimate, a ten by ten kitchen would typically cost between twelve and fifteen
-lakhs, depending on your finishes and accessories."
+**[PAUSE 1 second]**
 
-"This includes the SilverStone cabinets and shutters, internal shelves, soft-close hardware, factory
-fabrication, transportation, and installation. Accessories, appliances, and premium hardware upgrades
-are quoted separately."
+"That's for the cabinetry itself. Countertop, accessories and fitting are quoted on top of that."
+
+"So to give you a rough estimate, a full kitchen starts at around ten lakhs, and a ten by ten
+typically lands between twelve and fifteen, depending on the range and the accessories you choose."
+
+"Wellness Wardrobes start at seven thousand three hundred and twenty rupees per square foot."
 
 **[PAUSE 1 second]**
 
@@ -235,20 +237,20 @@ Orlando."
 **Say:** "Magppie Wellness Kitchens are made entirely from our patented sanitised stone. Zero percent
 wood. That means no trees are cut, and no harmful toxins like formaldehyde are released into your
 home. The stone contains real silver and copper nano-particles, which makes your kitchen naturally
-anti-bacterial and anti-fungal. It's termite-proof, waterproof, fire-safe, and comes with a 25-year
-unconditional guarantee plus 25 complimentary annual services."
+anti-bacterial and anti-fungal. It's termite-proof, waterproof, fire-safe, and comes with a 25 year
+unconditional guarantee plus five complimentary service visits."
 
 ## C-04 · 5-second version
 **Ask like:** in one line, quickly, summarise
 **Say:** "Magppie makes the world's first kitchens entirely from stone. Zero wood, zero formaldehyde,
-zero termites. Our patented SilverStone is antibacterial, scratch-proof, and comes with a 25-year
-guarantee plus 25 annual services."
+zero termites. Our patented SilverStone is antibacterial, scratch-proof, and comes with a 25 year
+guarantee plus five complimentary services."
 
 ## C-05 · The three-step value
 **Ask like:** why should I buy, what's the benefit, sum it up
 **Say:** "Three things, sir. Health, no formaldehyde, no termites, no fungus, so your family is safe.
-Durability, it's stronger than granite with a 25-year guarantee and zero maintenance. And service, we
-visit you every year for 25 years."
+Durability, it's stronger than granite with a 25 year guarantee and zero maintenance. And service, five
+complimentary visits from our team, at home, so it stays that way."
 
 ## C-06 · Why stone, the material science
 **Ask like:** why stone, why not wood, what's wrong with plywood, explain the thinking
@@ -297,8 +299,9 @@ modern homes."
 **Say:** "SilverStone is our patented wellness stone. We take porcelain clay, heat it to one thousand
 three hundred degrees, and infuse it with silver and copper nano-particles. That makes it
 anti-bacterial, anti-fungal, non-porous, stain-proof, scratch-resistant, and impact-resistant. It's
-100% food-grade, you can eat directly off it. It's stronger than granite and more elegant than
-marble. And because it's engineered, not mined, it doesn't harm the environment."
+100% food-safe — so hygienic you can knead dough or keep cut fruit right on the surface. It's
+stronger than granite and more elegant than marble. And because it's engineered, not mined, it
+doesn't harm the environment."
 **Key line:** "It looks like a stone, but it does not behave like a regular stone."
 
 ## K-02 · What is it made of, exactly
@@ -306,7 +309,8 @@ marble. And because it's engineered, not mined, it doesn't harm the environment.
 **Say:** "It's a sintered stone, sir. We take porcelain clay, add about 60 other particles, and bake
 it at one thousand three hundred degrees under extreme pressure. Then we infuse it with silver and
 copper nano-particles. That's what makes the whole stone bacteria-proof and food-grade. Food-grade
-means you can eat directly off the surface."
+means the surface is completely safe for food to touch — you can prepare and serve food directly
+on it, like a clean steel plate."
 
 ## K-03 · Is it real stone, natural or manmade
 **Ask like:** is it natural, is it real stone, artificial, manmade
@@ -319,7 +323,9 @@ stones are porous, so they stain and scratch."
 **Say them in this order, and only two or three at a time:**
 1. **Stain Safe** — "It's non-porous, so coffee, haldi, oil, everything just wipes off."
 2. **Scratch Safe** — "Daily chopping won't leave a mark."
-3. **High Load Bearing** — "Each drawer takes up to 60 kilos."
+3. **High Load Bearing** — "Drawers take 40 kilos in Wellness First and 70 kilos in Wellness Pro."
+   (These are the site's spec-table numbers on magppie.com/series — quote these, not the homepage's
+   "80 kg" marketing line.)
 4. **Fire Safe** — "Stone doesn't catch fire, and it doesn't spread flames."
 5. **Water Safe** — "We kept wood and our stone in water for 30 days. The wood swelled. The stone was
    unchanged."
@@ -355,7 +361,22 @@ degrees, contains no toxins, no epoxy, no glue. And mould and fungus simply cann
 material is completely different. They use compressed wood, which is under a hundred rupees a square
 foot, and it contains formaldehyde, attracts termites, and absorbs moisture. We use SilverStone,
 which costs around five hundred rupees a square foot as raw material. And no branded wooden kitchen
-gives you a 25-year guarantee with 25 annual services."
+gives you a 25 year unconditional guarantee with five complimentary services."
+
+## K-08A · Versus steel / stainless-steel kitchens
+**Ask like:** steel, stainless steel, SS kitchen, metal kitchen, galvanized, steel doesn't rust,
+steel is termite-proof
+**Always concede first — the customer is right about termites.** Then compare honestly.
+**Say:** "You're right, sir — steel doesn't get termites. And good steel is a serious material.
+Restaurants run on it. But a home kitchen is water, salt, and spice acids, every single day. Steel
+stays rust-free only while its coating is perfect. At welds, joints, and scratches, corrosion
+starts where you can't see it. And steel shows every dent, scratch, and fingerprint. SilverStone
+has nothing to rust — it's stone through and through. We kept it in water for 30 days and it was
+unchanged. It's scratch-safe, stain-safe, and fire-safe. Steel looks like a commercial kitchen.
+SilverStone comes in up to 24 designer finishes, so it looks like a home. And nobody offers on steel
+what we offer on stone — a 25 year unconditional guarantee with five complimentary services."
+**Close like:** "Steel solves the termite problem, sir. Stone solves the whole kitchen problem —
+water, fire, stains, looks — for 25 guaranteed years."
 
 ## K-09 · Is it heavy, will it damage my floor
 **Ask like:** heavy, weight, floor, load
@@ -383,7 +404,7 @@ or marble. Regular chopping and knife work won't leave marks."
 ## K-13 · Does it fade or lose finish
 **Ask like:** fade, colour, dull, finish wear off, look old
 **Say:** "No. Periodic testing and years of real use confirm it doesn't fade, wear out, or lose its
-finish. That's exactly why we're able to offer a 25-year warranty on the cabinets and countertops."
+finish. That's exactly why we're able to offer a 25 year warranty on the cabinets and countertops."
 
 ## K-14 · Is it fire-safe
 **Ask like:** fire, flame, heat, burn
@@ -399,9 +420,12 @@ One thing to note, the in-built lights are not waterproof, but they're positione
 exposed to water while you clean."
 
 ## K-16 · Is it really food-grade
-**Ask like:** food grade, eat off it, hygienic, safe for food
-**Say:** "Yes, it's 100% food-grade. The silver and copper infusion prevents bacteria, so it's
-hygienic enough to eat directly off."
+**Ask like:** food grade, eat off it, hygienic, safe for food, can we eat silverstone
+**Say:** "Yes, it's 100% food-grade. The silver and copper infusion prevents bacteria, so the
+surface is hygienic enough to prepare food directly on it — knead dough, cut fruit, serve a meal."
+**Careful:** food-grade means food is SAFE ON the stone, not that the stone is edible. If someone
+asks (or jokes) "can we EAT SilverStone?", never say yes — laugh along and clarify: "हाहा, खाने के
+लिए नहीं है सर — food-grade का मतलब है खाना उसके ऊपर रखना बिल्कुल safe है, जैसे एक साफ़ steel की थाली।"
 
 ## K-17 · Does it need polishing or buffing
 **Ask like:** maintenance, polish, buffing, upkeep
@@ -461,12 +485,40 @@ backsplash. Stone cabinets. Stone shelves. And even the carcass is stone. Zero w
 
 ## K-27 · Finishes
 **Ask like:** finishes, colours, designs, options, shades, textures
-**Say:** "We have over 40 finishes, sir, from sparkle high gloss all the way to super matt. Honestly
-that's something to see, not to hear on a call. Shall I have our consultant send you the full range on
+**Say:** "It depends on the range, sir. Wellness First has four shutter finish options, and Wellness
+Pro has twenty-four — including stone-vein and fluted or tinted glass fascias. Honestly that's
+something to see, not to hear on a call. Shall I have our consultant send you the full range on
 WhatsApp?"
-**Never read the list aloud.** If they insist on detail: "They're in two groups. Group one has 23
-finishes across four textures. Group two has 18 finishes across three textures. Our consultant will
-walk you through them properly."
+**Never read a full finish list aloud.** Both ranges come with the Galaxy Crema carcass finish. The
+site (magppie.com/series) publishes exactly these numbers — 4 for First, 24 for Pro — so never claim
+"40+ finishes" for kitchens.
+
+## K-27A · Named designs and series (the names on magppie.com)
+**Ask like:** Santorini, Onyx, Onyx Mystic, Onyx Black, Taj, Travertino, Timeless, Romano, poolside
+kitchen, what designs do you have, series names
+**These are design concepts and series names published on the site — recognise them, never deny
+them:**
+- Kitchen design concepts: "Magppie Santorini", "Magppie Onyx Mystic", "Magppie Onyx Black", and
+  "The Poolside Kitchen" concept. These are looks/designs, not separate price ranges — pricing is
+  still Wellness First / Wellness Pro.
+- Wardrobe series: Onyx Mystic, Onyx Gold, Taj, Travertino, Timeless.
+- Vanity series: Onyx Gold (overmount and undermount), Onyx Mystic, Taj, Romano, Flurry Black.
+**Say (if asked about any of these):** "That's one of our signature designs, sir — [name] is a look
+we build in both ranges. The consultant can show you photos of it on WhatsApp."
+**If the caller garbles a name** (e.g., "system" for Santorini): ask warmly which design they saw —
+"आपने website पे कौन सा design देखा, sir — Santorini, Onyx Mystic, Onyx Black?"
+
+## K-27B · The Tark System and named accessories
+**Ask like:** tark, tark system, what is the system, magic kubos, i-move, le mans, tandem pantry,
+accessories, pull-outs, what accessories do you have
+**Say:** "Those are our in-house accessory systems, sir, all finished in the same SilverStone — the
+Tark System, Magic Kubos, I-Move, the Le Mans corner unit, the Tandem Pantry, spice canister trays,
+bottle pull-outs, waste bins, even a chakla-belan tray made for Indian cooking. The Tark System comes
+included with Wellness Pro."
+**If they ask exactly how one works:** "That one's better seen than described, sir — shall I have
+our consultant send you a short video of it on WhatsApp?" (Never invent mechanics; the site lists
+the names, the consultant demos them.)
+**Accessories are quoted separately from the per-square-foot rate (see P-08).**
 
 ## K-28 · Do you do only countertops
 **Ask like:** countertop only, backsplash only, just the top
@@ -497,15 +549,17 @@ so right now our focus is on perfecting kitchens, wardrobes, flooring, and wall 
 # PART E — PRICE
 
 ## P-01 · Exact pricing
-**Ask like:** price, cost, rate, how much, kitna
+**Ask like:** price, cost, rate, how much, kitna, starting price, cheapest, lowest, entry level,
+what's your budget range
 **First, if not yet asked, run B6. Then [PAUSE 1 second].**
-**Say:** "Kitchens range from eighty-four hundred to ten thousand eight hundred rupees per square
-foot, based on the finish you choose. Wardrobes start at seven thousand three hundred and twenty per
-square foot. A ten by ten kitchen typically comes to between twelve and fifteen lakhs."
-"That includes SilverStone cabinets and shutters, internal shelves, soft-close hardware, factory
-fabrication, transportation, and installation. Accessories, appliances, and premium hardware upgrades
-are quoted separately."
+**Say:** "We have two ranges, sir. Wellness First starts at fifty-nine hundred rupees a square foot.
+Wellness Pro, our flagship, is just under ten thousand."
+"That's for the cabinetry. Countertop, accessories and fitting are quoted on top."
+"A full kitchen usually starts around ten lakhs, and a ten by ten typically lands between twelve and
+fifteen. Wardrobes start at seven thousand three hundred and twenty a square foot."
 "And we follow a fixed price policy, sir. Complete transparency. No discounts, no hidden charges."
+**If they only want one number, say: "Our kitchens start at fifty-nine hundred a square foot."
+Do not recite both ranges twice in one call.**
 
 ## P-02 · How do you calculate, per running foot or square foot
 **Ask like:** how calculated, running feet, square feet, measurement, is depth included
@@ -523,8 +577,8 @@ the material."
 "And wood kitchens face termites, water damage, fungus, and formaldehyde. That means repairs, pest
 treatment, and often a full replacement within five to seven years. Our stone kitchens stay as good
 as new for decades. Add up the lifetime cost, and Magppie often works out to be the smarter
-investment. Plus you get a 25-year guarantee and 25 annual services, so you're not spending again and
-again on maintenance."
+investment. Plus you get a 25 year guarantee and five complimentary services, so you're not spending
+again and again on maintenance."
 "Would you like me to share a customised proposal for your layout, so you can see the exact value?"
 
 ## P-04 · What's in my scope
@@ -542,12 +596,86 @@ during the design phase."
 ## P-06 · The price anchor, for context in any price conversation
 - Compressed wood material: under Rs. 100 per sq.ft.
 - SilverStone material: around Rs. 500 per sq.ft.
-- Magppie kitchen: Rs. 8,400 to 10,800 per sq.ft., all-inclusive
+- Magppie kitchen: Rs. 5,900 (Wellness First) to Rs. 9,900 (Wellness Pro) per sq.ft., cabinetry only
+  (9,900 is the site-published figure on magppie.com/kitchens and /series — never quote 9,943)
+- A full kitchen, delivered: from about Rs. 10 lakhs; a typical 10 x 10 is Rs. 12 to 15 lakhs
 - Branded wooden kitchen: similar price, but toxic and high maintenance
+
+**There are only two ranges: Wellness First and Wellness Pro. "Gold" (or "the Gold series") is the
+Magppie team's own name for Wellness First — treat the two names as the same range. Silver, Elite
+and Signature are dead names. If a customer uses one, do not correct them at length — just say "we
+call those Wellness First and Wellness Pro now, sir" and carry on.**
+
+## P-07 · The two ranges
+**Ask like:** ranges, options, packages, tiers, variants, series, models, what are my choices,
+wellness first, wellness pro, gold, silver, elite, signature
+**Say:** "Two ranges, sir. Wellness First, and Wellness Pro, which is our flagship."
+"Both are 100% SilverStone. Same fifteen-millimetre stone carcass, same stone doors, same Magppie
+hardware. The material never changes."
+"What changes is the finishing, and the guarantee. Wellness First is the clean, essential version,
+with five years on the stone. Wellness Pro adds the built-in lighting, the thicker countertop, and
+the stone-vein finishes, and carries twenty-five years on the stone."
+**Close like:** "Once I see your layout, I can show you what each one would actually cost for your
+kitchen. Shall I take it on WhatsApp?"
+**Never read the full specification list aloud. Name two or three differences, then stop.**
+
+## P-08 · What the per-square-foot price does not include
+**Ask like:** what's included, what's extra, hidden cost, does it include countertop, all inclusive
+**Say:** "Straight answer, sir. The per-square-foot rate covers the cabinetry. The countertop, the
+accessories, and the fitting are quoted on top of it."
+"Your final package does include the installation, the site measurement, and the basic accessories.
+It's just not inside that per-square-foot number."
+"That's exactly why I'd rather send you a proper estimate than a rough figure. On your layout you'll
+see every line, with nothing hidden."
+**Never call the per-square-foot rate "all-inclusive."**
+
+## P-09 · What actually changes between the two ranges
+**Ask like:** difference between first and pro, why is pro costlier, what do I get extra, is the
+cheaper one lower quality, is wellness first inferior
+**Never suggest Wellness First is poor quality. Same stone, same thickness. The guarantee period is
+the one real difference — say it straight, never hide it, never bury it.**
+**Say:** "Nothing structural, sir. Same stone, same thickness, same hardware brand. The guarantee is
+the real difference — twenty-five years on the stone with Wellness Pro, five years with Wellness
+First. Both get five complimentary service visits."
+- **Guarantee:** "Pro carries twenty-five years on the stone. First carries five. Same five
+  complimentary services on both."
+- **Lighting:** "Wellness Pro has built-in profile lights inside the wall and tall units, under the
+  cabinets, and in the skirting. Wellness First has the dado light."
+- **Countertop:** "First is a fifteen-millimetre top with a chamfered edge. Pro is thirty-millimetre
+  with a drop-down edge and a light under it."
+- **Finishes:** "First has four shutter finishes and three countertop finishes. Pro has twenty-four
+  of each, including the stone-vein ones."
+- **Drawers:** "First drawers carry forty kilos, Pro carries seventy."
+- **Extras:** "Pro also includes the Tark system, the cornice, and wall panelling with backsplash."
+**Say one or two of these, whichever they asked about. Never the whole list.**
+**Close like:** "If you share your layout, I'll price the same kitchen in both and you can see the
+difference in rupees rather than in features."
+**Never close this with "would you like to know more?" — put the layout question instead.**
+
+## P-10 · Matching a range to their budget
+**Ask like:** which one should I take, what fits my budget, is there something cheaper, recommend one
+**Never push the costlier range. Match honestly and let the layout decide.**
+- **Tight budget or first home** → "Then I'd start you on Wellness First, sir. Fifty-nine hundred a
+  square foot, same stone. You skip the built-in lighting and the thicker top, and the guarantee is
+  five years on the stone instead of twenty-five. Five complimentary services either way."
+- **Wants the lighting, the veins, or the premium look** → "Wellness Pro, sir. Just under ten
+  thousand a square foot. That's where the built-in lighting, the thirty-millimetre countertop, the
+  wall panelling and the stone-vein finishes come in."
+**Close like:** "Share your layout and I'll have the exact number for the range you like."
 
 ---
 
 # PART F — TRUST
+
+## T-00 · Certifications and lab tests (site-published — strong objection ammo)
+**Ask like:** proof, certified, tested, lab report, how do I believe you, ISO, standards
+**Say (pick ONE or TWO relevant ones, never the list):**
+- "The antibacterial claim is lab-confirmed, sir — 100% bacteria-safe under ASTM E-2180."
+- "Water: zero permeability under pressure, tested to BS EN 12390. We've kept the stone under water
+  for thirty days — zero change."
+- "Fire: Class A flame-spread rating under ASTM E-84 — the safest class there is."
+- "And as a company we're ISO 9001 and ISO 14001 certified."
+**These are all published on magppie.com — the caller can verify while on the phone.**
 
 ## T-01 · Awards
 **Ask like:** awards, recognition, won anything
@@ -555,7 +683,11 @@ during the design phase."
 Kitchen and Bath Industry Show. We won the Most Unexpected Innovation award, placing in the top three
 alongside global leaders like Caesarstone and LG. It was presented to our Director of US Operations,
 Kishor Rico, in February 2026."
-**Do not mention any other award.**
+**If they ask what else, or want more credibility, add one of these and then stop:**
+- "We've also been recognised with the Red Dot Award and the IDEA Award for design."
+- "And we're members of the National Kitchen and Bath Association, the National Stone Institute, and
+  the International Surface Fabricators Association."
+**Never recite awards and memberships together as a list. One extra line, maximum.**
 
 ## T-02 · Celebrity customers
 **Ask like:** who are your clients, celebrities, famous customers, references
@@ -576,6 +708,8 @@ why these families chose us."
 
 ## T-04 · No showroom in my city
 **Ask like:** no showroom, not in my city, how do I trust you, far away
+**Check H-03 first. If they named Delhi, Mumbai, Mohali, Surat, Hyderabad, Bengaluru or Coimbatore,
+we DO have an office there — use H-03 and do not run this section.**
 **Say:** "That's a very valid question, sir. Trust is built through systems, accountability, and
 proven performance, not just showrooms. We manufacture centrally with uniform quality standards, we
 deploy in-house trained installation teams, we give written commitments, and we offer pan-India
@@ -596,12 +730,17 @@ platforms. Customer satisfaction is something we take a lot of pride in."
 
 ## T-07 · Where are you based
 **Ask like:** where are you, headquarters, based, location
-**Say:** "We started from Delhi, but we now provide services pan-India and internationally. We even
-have a store in Florida, USA, and we're expanding globally."
+**Say:** "Our head office is in Delhi, sir, at Sultanpur on MG Road, and our factory is in Manesar.
+We now serve pan-India, with offices in Mumbai, Mohali, Surat, Hyderabad, Bengaluru and Coimbatore."
+"And we've gone international too. We have a head office and a factory in Florida, and an office in
+Texas."
+**Only list the cities if they actually asked how widely you operate. Otherwise name Delhi and stop.**
 
 ## T-08 · Do you serve my city
 **Ask like:** do you come to, serviceable, my city, pan india
 **Say:** "Yes, we provide our services pan-India, sir."
+**If their city is in H-01, say so and offer the local office: "And we have an office right in
+[city], so you'd be looked after locally."**
 
 ## T-09 · Have you done projects in my city
 **Ask like:** projects in, installations in, work in my city
@@ -614,8 +753,9 @@ about specific installations in your city."
 
 ## S-01 · How long does it take
 **Ask like:** timeline, how long, duration, when will it be ready
-**Say:** "From final order to installation, it's around three to four months, depending on site
-conditions and design complexity. Fast-track options may be available, and our consultant can confirm
+**Say:** "About three months, sir, and that covers production, delivery and installation. It can
+stretch a little depending on site conditions and design complexity. Fast-track options may be
+available, and our consultant can confirm
 that for your project."
 
 ## S-02 · What happens after I share my layout
@@ -647,21 +787,47 @@ one of our experience centres. Would you like me to arrange a sample?"
 right now."
 
 ## S-07 · The guarantee
-**Ask like:** guarantee, warranty, how many years
-**Say:** "Twenty-five years on the SilverStone cabinetry and countertops. Ten years on hardware and
-accessories. And two years on the lighting."
+**Ask like:** guarantee, warranty, how many years, warranty period, gold series warranty, guarantee
+on the stone, wellness first guarantee, wellness pro guarantee
+**The number comes first, in one clean breath. Always say "years" as a full word — never "yrs",
+never a hyphenated "25-yr". The guarantee depends on the range, and the two ranges are NOT the
+same here.**
+- **Wellness Pro — the flagship, and the default when no range has come up yet:**
+  "Twenty-five years, sir. Unconditional, on the stone. And five complimentary service visits come
+  with it."
+- **Wellness First — the Gold series:**
+  "On Wellness First, our Gold series, it's five years on the stone, sir. And you get the same five
+  complimentary service visits."
+- **If they ask whether the cheaper range gets less, or what the difference is:**
+  "Yes, that's the one real difference, sir. Wellness Pro carries twenty-five years on the stone,
+  Wellness First carries five. Same stone, and both get five complimentary services."
+**Once a caller has chosen Wellness First, or is asking about it, every guarantee mention in the
+rest of the call uses five years — never quote twenty-five to a Wellness First caller.**
+**Hardware and lighting — only if they ask, and these are the Wellness Pro terms:** "Ten years on
+the hardware, and two years on the lighting." Never volunteer these; the caller asked one question,
+answer that one. If a Wellness First caller asks about hardware terms: "The stone is five years,
+sir. For the hardware terms on Wellness First, let me have our consultant confirm that on WhatsApp."
 
-## S-08 · What does the 25-year guarantee cover
-**Ask like:** what's covered, guarantee cover, warranty details
-**Say:** "The 25-year unconditional guarantee covers termites, water damage, discoloration, swelling,
-warping, and any manufacturing defects on the stone. Accidental damage is the only thing that's
-chargeable."
+## S-08 · What does the guarantee cover
+**Ask like:** what's covered, guarantee cover, warranty details, what's excluded, unconditional
+**Say:** "It's unconditional, sir. Termites, water damage, swelling, warping, and colour
+deterioration, all covered. That's twenty-five years on Wellness Pro, and five years on Wellness
+First. Accidental damage is the only thing that's chargeable."
 
-## S-09 · The 25 complimentary annual services
-**Ask like:** free service, annual service, maintenance visits
-**Say:** "You get 25 complimentary annual services, one every single year. Our team visits to do deep
-cleaning, sanitisation, and an alignment and performance check. So your kitchen stays fresh, safe,
-and perfectly aligned for decades."
+## S-09 · The five complimentary services
+**Ask like:** free service, annual service, maintenance visits, how many services, servicing, AMC,
+what happens in the service, services on the gold series, services on wellness first
+**Say:** "Five complimentary service visits, sir — that's what we publish on our site with every
+kitchen, wardrobe, and vanity."
+"Our team comes home for a deep clean, sanitisation, and an alignment and performance check on the
+hardware. So your kitchen stays fresh, safe, and perfectly aligned."
+"And there's no polishing or buffing involved, ever. Stone doesn't need it."
+**Never say "25 annual services" — that's an old internal claim; the site says five, and callers
+check the site.** If someone quotes "25 services" back at you, correct gently: "The guarantee is
+twenty-five YEARS, sir — and five complimentary service visits come with it."
+**Both ranges get this — Wellness Pro and Wellness First (the Gold series) alike. It is not an
+upgrade and it is not an add-on cost. The guarantee PERIOD differs between the ranges (S-07); the
+five services do not.**
 
 ## S-10 · If hardware rusts, will you replace it
 **Ask like:** rust replacement, hardware fails
@@ -694,30 +860,73 @@ with your designer directly?"
 
 ---
 
-# PART H — STORES
+# PART H — STORES AND CONTACT NUMBERS
 
-**Rule:** never say "we have stores all across the country." Name only the city they ask about. If
-their city is not on this list, offer a sample delivery or a video call instead.
+**Rule:** never say "we have stores all across the country." Name only the city they ask about, and
+never read this table out. If their city is not listed, offer a sample delivery or a video call.
 
-| City | Address |
-|---|---|
-| Delhi, Sultanpur | 352, Upper Ground Floor, Sultanpur, MG Road, near Sultanpur Metro Station |
-| Delhi, Kirti Nagar | 12/1, W.H.S., Block-2 |
-| Delhi, Saket | Shop 12, Ground Floor, Select City Walk Mall |
-| Mohali | SCO No.66, Airport Road, Sector 82, JLPL |
-| Mumbai | One Lodha Place, Office No.1615B, Senapati Bapat Marg, Lower Parel |
-| Surat | Solaris Cube, Ground Floor, Vesu, Maharana Pratap Road |
-| Bangalore | 1154, 12th Main Road, Indiranagar |
-| Hyderabad | Road No.45, Jubilee Hills |
-| USA | 802 NW 5th Avenue, Suite 100, Gainesville, Florida |
+**Saying a phone number out loud:** say it digit by digit, slowly, in two groups. Then always offer
+to send it on WhatsApp, because numbers get lost on a call. Never say a number twice in a row unless
+they ask you to repeat it.
 
-**If asked about Bangalore or Hyderabad:** "Let me check the current status with our team and get back
-to you. In the meantime, can I arrange a sample delivery or a quick video call with one of our
-experts?"
+## H-01 · India locations
 
-**If their city is not listed:** "We don't have a store in your city yet, sir. But we serve pan-India,
-and I can arrange a sample delivery to your home, or a video call with our expert. Which would work
-better for you?"
+| City | Address | Phone |
+|---|---|---|
+| New Delhi (head office) | 352 Sultanpur, MG Road, New Delhi 110030 | +91 90155 67401 |
+| New Delhi, Kirti Nagar | 12/1 W.H.S., Block-2, Kirti Nagar, New Delhi 110015 | +91 97110 08775 |
+| Mumbai | One Lodha Place, 1615B, Lower Parel, Mumbai 400013 | +91 6269 080 008 |
+| Mohali | SCO 66, Airport Road, Sector 82, Mohali 140308 | +91 97110 08764 |
+| Surat | Ground Floor, Solaris Cube, Vesu, Surat 395007 | +91 97110 08734 |
+| Hyderabad | Golden Square, Road No. 45, Jubilee Hills, Hyderabad 500033 | +91 70650 50893 |
+| Bengaluru | 1154, 12th Main Road, Indiranagar, Bengaluru 560038 | +91 99999 99012 |
+| Coimbatore | 84 West Sambandham Road, R.S. Puram, Coimbatore 641002 | +91 99441 34364 |
+
+**India factory:** Plot 68, Sector-3, IMT Manesar, Gurugram 122052.
+**General enquiry line, when no city applies:** +91 99999 99012.
+**Showroom hours (all India locations):** Monday to Saturday, 10 AM to 7 PM, by appointment.
+(Phone numbers above match magppie.com/contact as of September 2026.)
+
+## H-02 · USA locations
+
+| Place | Address | Phone |
+|---|---|---|
+| Gainesville, Florida (US head office) | 802 NW 5th Avenue, Suite 100, Gainesville, FL 32601 | +1 352-213-6412 |
+| Alachua, Florida (US factory) | 13625 W SR 235, Alachua, FL 32615 | +1 352-359-4965 |
+| Mansfield, Texas | 221 Regency Pkwy, Mansfield, TX 76063 | +1 313-505-2932 |
+
+## H-03 · Do you have a store in my city
+**Ask like:** store, showroom, address, location, near me, can I visit, where are you in [city]
+
+**WE HAVE AN OFFICE IN THESE EIGHT INDIAN CITIES: Delhi, Mumbai, Mohali, Surat, Hyderabad,
+Bengaluru, Coimbatore. Plus Gainesville and Mansfield in the USA. Read this line before you answer.
+If the city they named is on it, the answer is YES.**
+
+**If their city is on that list:** say yes, name the area, offer the number.
+**Say:** "Yes sir, we're in [city], at [area]. Would you like me to WhatsApp you the address and the
+number?"
+
+**NEARBY CITIES WE OFFICIALLY SERVE from the closest office (site-published service areas — a caller
+from one of these gets a YES, served by the office in brackets):** Gurugram, Noida, Ghaziabad (Delhi
+offices); Thane, Navi Mumbai (Mumbai); Vadodara, Ahmedabad (Surat); Chandigarh, Panchkula (Mohali);
+Secunderabad (Hyderabad); Mysuru (Bengaluru); Erode, Tiruppur (Coimbatore).
+**Say for a served city:** "We serve [their city] from our [office city] studio, sir — the team
+comes to you. Shall I share their number on WhatsApp?"
+
+**Only if their city is NOT on either list:** "We don't have an office in your city yet, sir. But we
+do serve pan-India, and I can arrange a sample delivery to your home, or a video call with our
+expert. Which would work better for you?"
+
+**Never say "we don't have a store there" about a city on the list above. Check the list first.**
+**Never list more than one city at a time. Never read out the factory addresses to a customer.**
+
+## H-04 · Service centres and after-sales contact
+**Ask like:** service centre, who will service me, support number, after sales contact,
+customer care, complaint number
+**Say:** "Service is run out of our city offices, sir, not a separate call centre. Whichever office
+is closest to you handles your kitchen after handover."
+**Then give that city's number from H-01, or the general line if their city is not listed.**
+"And your complimentary service visits are scheduled for you. You won't have to chase anyone."
 
 ---
 
@@ -788,10 +997,11 @@ kitchens. If that wasn't you, I'm very sorry to disturb you, and I'll remove you
 # PART J — WHATSAPP AND DM TEMPLATES
 
 ## W-01 · Price inquiry
-"Hey [Name] Ji, thank you for reaching out! The per square feet price for our Wellness Kitchen ranges
-from Rs. 8,400 to Rs. 10,800 based on the finish you choose. To give a rough estimate, a 10x10
-kitchen would typically come to Rs. 12 to 15 lakhs. Please share your contact details and our
-wellness consultants can reach out to you!"
+"Hey [Name] Ji, thank you for reaching out! We make our Wellness Kitchens in two ranges. Wellness
+First starts at Rs. 5,900 per sq. ft. and Wellness Pro, our flagship, is Rs. 9,900. That's for the
+cabinetry, with countertop, accessories and fitting quoted separately. A full kitchen starts at
+around Rs. 10 lakhs, and a 10x10 typically comes to Rs. 12 to 15 lakhs. Please share your contact
+details and our wellness consultants can reach out to you!"
 
 ## W-02 · General interest
 "Hey [Name] Ji, thank you for reaching out. At Magppie Wellness Kitchens, we make kitchens fully from

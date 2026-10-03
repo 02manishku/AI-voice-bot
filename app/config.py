@@ -48,6 +48,19 @@ class Settings(BaseSettings):
     sarvam_tts_model: str = "bulbul:v3"
     sarvam_tts_speaker: str = "shubh"
     sarvam_tts_pace: float = 1.0
+    # Kept only for the greeting cache keys. bulbul:v3 REJECTS a loudness param
+    # (400: "currently not supported"), so output level is shaped downstream:
+    # the phone leg applies exotel_tts_gain with a clip-proof limiter.
+    sarvam_tts_loudness: float = 1.0
+    # Hindi pace. 1.0 = Bulbul's natural delivery, unchanged — a 1.1 boost was
+    # tried to level Hindi with English and the caller heard it as "too fast";
+    # the speaker's own pacing wins. Knob kept (SARVAM_TTS_PACE_HI) in case a
+    # future speaker needs levelling, but the default is hands-off.
+    sarvam_tts_pace_hi: float = 1.0
+    # The pre-built intro ONLY. Team feedback (2026-08-31): the greeting flew by
+    # too fast for callers to register "this is Magppie". 0.9 = a touch slower,
+    # medium pace — the intro lands, everything after speaks at normal pace.
+    sarvam_tts_pace_greeting: float = 0.9
 
     # Stream TTS audio over a WebSocket (first audio ~300ms) instead of the REST
     # call that returns the whole clip (~1800ms). Set TTS_STREAMING=false to fall
@@ -72,6 +85,63 @@ class Settings(BaseSettings):
     # own audio leaking back through the mic and falsely interrupting him.
     stt_high_vad_sensitivity: bool = False
     stt_interrupt_min_speech_frames: int = 12
+    # End-of-speech hangover: how many consecutive silence frames close the turn.
+    # This window is pure dead air between the caller's last word and END_SPEECH —
+    # the single largest piece of perceived latency. Measured live: 5 frames ≈
+    # 340ms (so ~68ms/frame), vs ~770ms at the server default — but 340ms proved
+    # TOO eager, splitting a natural mid-sentence pause into two turns. 7 ≈
+    # ~480ms: still ~300ms faster than default, without jumping on a caller who
+    # pauses to think. None = don't send, keep the server default.
+    stt_negative_frames_count: int | None = 7
+
+    # Exotel Voicebot stream — optional. When both are set, /exotel/stream
+    # requires Basic auth (the applet URL carries wss://KEY:TOKEN@host and
+    # Exotel forwards it as an Authorization header). Blank = auth off, for
+    # local simulator testing only; the endpoint logs a warning per call.
+    exotel_ws_key: str = ""
+    exotel_ws_token: str = ""
+    # RNNoise on the phone leg's inbound audio (app/denoise.py). Real calls come
+    # from noisy rooms and speakerphones; the first team test round (2026-08-31)
+    # showed background noise opening Sarvam's VAD constantly — junk turns,
+    # barge-in storms cutting Shubh mid-reply, the rate limiter burning its
+    # budget on noise. Costs ~0.8ms of CPU per 20ms chunk, no added latency.
+    exotel_denoise: bool = True
+    # Barge-in resistance for the PHONE leg only. The browser leg keeps
+    # stt_interrupt_min_speech_frames (12); a phone in a noisy Indian street
+    # needs sustained speech, not a horn blast, before Shubh shuts up. Real
+    # interruptions ("wait wait", "नहीं नहीं रुको") are a second or more of
+    # speech and still cut him within a beat.
+    exotel_interrupt_min_speech_frames: int = 24
+    # Loudness on the phone leg. Bulbul already peaks at full scale (-0 dBFS)
+    # but with speech RMS around -14 dBFS — dynamic studio audio that reads as
+    # QUIET on a phone earpiece (first real call, 2026-08-29). This gain is the
+    # STARTING gain; a soft-knee clip keeps peaks from buzzing.
+    exotel_tts_gain: float = 2.0
+    # AGC: Bulbul's level also varies per synthesis call (head and tail of one
+    # answer render on separate sockets; Hindi vs English differ too), which
+    # callers heard as "volume keeps fluctuating" (2026-09-02 team round). The
+    # phone leg now steers gain continuously toward this speech-RMS target
+    # (11500 ≈ the level the team called comfortable). 0 = AGC off, fixed gain.
+    exotel_tts_target_rms: int = 11500
+    # Per-caller memory (app/caller_memory.py): Shubh remembers a phone number
+    # across calls — notes rewritten by one cheap LLM call AFTER each call, one
+    # local file read at pickup. False = every call is a stranger again.
+    caller_memory_enabled: bool = True
+    # The spoken "thinking beat". The model's first token alone is ~1.2s and
+    # first audio ~1.7s after the transcript (measured 2026-09-03) — dead air a
+    # person would fill with a "Hmm." / "जी।". If the answer's audio hasn't
+    # started by reply_filler_after_ms, one short pre-rendered beat plays in
+    # the reply's language, on reply_filler_chance of turns, never the same
+    # beat twice running. REPLY_FILLER=false switches it off entirely.
+    reply_filler: bool = True
+    reply_filler_after_ms: int = 700
+    reply_filler_chance: float = 0.75
+    # Background-voice gate on the caller's audio. RNNoise removes NOISE but
+    # passes any human speech — including people talking near the caller, which
+    # became junk turns in random languages (2026-09-02 calls). Frames far
+    # quieter than the caller's own running speech level get ducked before
+    # Sarvam hears them. False = off.
+    exotel_speech_gate: bool = True
 
     # Zoho CRM — optional. When these three secrets are set, the greeting opens
     # by the freshest lead's name ("Hi Rahul, ... your modular kitchen ..."). All
@@ -116,8 +186,16 @@ class Settings(BaseSettings):
     # Rate limits. Every turn spends real credits (~Rs 0.6, mostly TTS), so
     # these exist to stop a stuck client or an idle open tab draining the
     # account. Per-caller stops one bad session; daily caps total exposure.
-    max_turns_per_minute: int = 12
-    max_turns_per_day: int = 300
+    # 20/min: real phone calls (2026-08-31 logs) legitimately split questions
+    # into rapid fragments and hit the old 12 — which then silently dropped a
+    # REAL question ("What is the silver stone?"). The junk-turn filter now
+    # keeps noise from spending the budget; this cap only stops runaways.
+    max_turns_per_minute: int = 20
+    # 1000: sized for real phone-testing days, not browser demos — the team
+    # burned the old 300 in one afternoon (2026-09-03) and every call after
+    # played the greeting then went MUTE (the refusal had no voice). Worst-case
+    # exposure at ~Rs 0.6/turn is ~Rs 600/day. .env carries the live override.
+    max_turns_per_day: int = 1000
 
     @property
     def kb_path(self) -> Path:

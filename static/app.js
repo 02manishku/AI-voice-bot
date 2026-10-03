@@ -511,7 +511,7 @@ class VoicePlayer {
       const src = this.ctx.createBufferSource();
       src.buffer = buf;
       src.connect(this.dest);
-      const at = Math.max(this.ctx.currentTime + 0.04, this.nextAt);
+      const at = Math.max(this.ctx.currentTime + 0.02, this.nextAt);
       src.start(at);
       this.nextAt = at + buf.duration;
       this.live.add(src);
@@ -540,7 +540,7 @@ class VoicePlayer {
       // Butt chunk N+1 against the end of chunk N on the audio clock. Waiting
       // for onended instead — which is what this used to do — left an audible
       // hole in the middle of a sentence that was only split for latency.
-      const at = Math.max(this.ctx.currentTime + 0.04, this.nextAt);
+      const at = Math.max(this.ctx.currentTime + 0.02, this.nextAt);
       src.start(at);
       this.nextAt = at + buf.duration;
       this.live.add(src);

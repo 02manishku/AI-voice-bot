@@ -51,11 +51,12 @@ class STTStreamError(RuntimeError):
 class Session:
     """One open STT socket. `feed()` sends audio; `events()` yields typed events."""
 
-    def __init__(self, ws):
+    def __init__(self, ws, sample_rate: int = STREAM_SAMPLE_RATE):
         self._ws = ws
+        self._sample_rate = sample_rate
 
     async def feed(self, pcm: bytes) -> None:
-        """Send a chunk of raw 16-bit little-endian mono PCM at 16 kHz."""
+        """Send a chunk of raw 16-bit little-endian mono PCM at the session rate."""
         if not pcm:
             return
         # encoding is a fixed literal in the SDK; the real codec is set at connect
@@ -63,7 +64,7 @@ class Session:
         await self._ws.transcribe(
             audio=base64.b64encode(pcm).decode("ascii"),
             encoding="audio/wav",
-            sample_rate=STREAM_SAMPLE_RATE,
+            sample_rate=self._sample_rate,
         )
 
     async def flush(self) -> None:
@@ -95,29 +96,57 @@ class Session:
 class _Connect:
     """`async with connect() as session:` — opens the socket, yields a Session."""
 
-    def __init__(self, language_code: str):
+    def __init__(
+        self,
+        language_code: str,
+        sample_rate: int = STREAM_SAMPLE_RATE,
+        interrupt_min_speech_frames: int | None = None,
+    ):
         self._language_code = language_code
+        # Telephony calls negotiate their own rate (Exotel: 8k default, 16k on
+        # request); Sarvam's SDK accepts 8000/16000, verified. Browser stays 16k.
+        self._sample_rate = sample_rate
+        # Per-transport barge-in resistance: the phone leg passes a higher value
+        # than the browser's settings default (noisy rooms, speakerphone echo).
+        self._interrupt_frames = (
+            interrupt_min_speech_frames
+            if interrupt_min_speech_frames is not None
+            else settings.stt_interrupt_min_speech_frames
+        )
         self._cm = None
 
     async def __aenter__(self) -> Session:
+        extra = {}
+        if settings.stt_negative_frames_count is not None:
+            # Shorter end-of-speech hangover: fewer silence frames close the turn
+            # sooner, cutting the dead air before END_SPEECH (see config).
+            extra["negative_frames_count"] = str(settings.stt_negative_frames_count)
         self._cm = _client().speech_to_text_streaming.connect(
             # "unknown" lets Saaras auto-detect per turn (returned on each Transcript).
             language_code=self._language_code,
             model=settings.sarvam_stt_model,
             mode=settings.sarvam_stt_mode,
-            sample_rate=str(STREAM_SAMPLE_RATE),
+            sample_rate=str(self._sample_rate),
             vad_signals="true",
+            # Lets Session.flush() force-finalize the transcript the moment
+            # END_SPEECH fires, instead of waiting out the server's own pace.
+            flush_signal="true",
             high_vad_sensitivity="true" if settings.stt_high_vad_sensitivity else "false",
-            interrupt_min_speech_frames=str(settings.stt_interrupt_min_speech_frames),
+            interrupt_min_speech_frames=str(self._interrupt_frames),
             input_audio_codec="pcm_s16le",
+            **extra,
         )
         ws = await self._cm.__aenter__()
-        return Session(ws)
+        return Session(ws, self._sample_rate)
 
     async def __aexit__(self, *exc) -> None:
         if self._cm is not None:
             await self._cm.__aexit__(*exc)
 
 
-def connect(language_code: str = "unknown") -> _Connect:
-    return _Connect(language_code)
+def connect(
+    language_code: str = "unknown",
+    sample_rate: int = STREAM_SAMPLE_RATE,
+    interrupt_min_speech_frames: int | None = None,
+) -> _Connect:
+    return _Connect(language_code, sample_rate, interrupt_min_speech_frames)
